@@ -30,42 +30,39 @@
   }
 
 
-3. 書誌情報の検索 (Read)
-HTTPメソッド	エンドポイント	機能	確認方法 (例)
-GET	/api/biblios/search?q=...	タイトル部分一致による検索	- ブラウザ: http://localhost:4000/api/biblios/search?q=java (結果はJSONリスト)
-- curl: curl "http://localhost:4000/api/biblios/search?q=java"
-クエリパラメータ: q=タイトルの一部
-パラメータなし or 空文字の場合: 全件取得
-成功時: 200ステータス + [ {...}, {...}, ... ] (ISBN/タイトル/出版社 の配列)
-4. 書誌情報の更新 (Update)
-HTTPメソッド	エンドポイント	機能	確認方法 (例)
-PUT	/api/biblios/:isbn	指定したISBNの書誌情報(タイトル,出版社)を更新	- ブラウザ: フロントエンドで編集フォーム & axios.put
-- curl:
-bash<br>curl -X PUT -H "Content-Type: application/json" -d '{"title":"新タイトル","publisher":"新出版社"}' http://localhost:4000/api/biblios/1234567890123<br>
-ボディ例 (JSON):
+## 3. 書誌情報の検索 (Read)
+
+**HTTPメソッド**: `GET`  
+**エンドポイント**: `/api/biblios/search?q=...`  
+**機能**:  
+- 書誌情報(ISBN/タイトル/出版社)のうち、「タイトル」に部分一致するデータを検索する  
+
+レスポンス例
+成功時 (ステータス: 200)
 json
 コピーする
 編集する
+[
+  {
+    "isbn": "1234567890123",
+    "title": "Java入門",
+    "publisher": "技術評論社"
+  },
+  {
+    "isbn": "1234567890124",
+    "title": "Effective Java",
+    "publisher": "Pearson"
+  }
+]
+クエリパラメータ q が空の場合: 全件取得を返却
+エラー時 (ステータス: 500など)
+
 {
-  "title": "新タイトル",
-  "publisher": "新出版社"
+  "error": "Server Error"
 }
-成功時: 200ステータス + 更新後オブジェクト / 404(未存在) or 500(サーバエラー)
-5. 書誌情報の削除 (Delete)
-HTTPメソッド	エンドポイント	機能	確認方法 (例)
-DELETE	/api/biblios/:isbn	指定したISBNの書誌情報を削除する	- ブラウザ: フロント側で一覧表示に「削除」ボタン → axios.delete
-- curl:
-curl -X DELETE http://localhost:4000/api/biblios/1234567890123
-成功時: 200ステータス + { message: "Deleted successfully" } / 404(未存在)
 補足
-ブラウザで直接確認できるAPI
-GET /api/health と GET /api/biblios/search は、アドレスバーへURLを入力すればJSONが表示される
-POST / PUT / DELETE は通常アドレスバーからは送れない
-フロントエンド(React)や curl, Postman等でHTTPメソッドを指定して実行
-DB構成
-biblios テーブル: isbn (PK, VARCHAR(13)), title (TEXT), publisher (TEXT)
-エラー時
-400: バリデーションエラー (ISBN13桁でない、重複など)
-404: 指定リソース(ISBN)が存在しない
-500: サーバー内エラー(DB接続不良など)
-以上が、書誌情報管理アプリのAPI一覧
+タイトル部分一致
+コード側で title ILIKE '%...%' を用いているため、大小文字区別なく検索可能
+CORS対策
+フロントエンド(React)など別オリジンから利用する際は、バックエンドで cors() を設定しておく
+  
