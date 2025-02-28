@@ -1,0 +1,23 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo "Logging in to Amazon ECR..."
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - REPO_NAME=my-backend-repo
+      - IMAGE_TAG=latest
+  build:
+    commands:
+      - echo "Building the Docker image..."
+      - docker build -t $REPO_NAME:$IMAGE_TAG .
+  post_build:
+    commands:
+      - echo "Pushing the Docker image to ECR..."
+      - docker tag $REPO_NAME:$IMAGE_TAG $ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$REPO_NAME:$IMAGE_TAG
+      - docker push $ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$REPO_NAME:$IMAGE_TAG
+
+artifacts:
+  files:
+    - '**/*'
+  discard-paths: yes
