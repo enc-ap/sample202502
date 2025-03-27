@@ -12,7 +12,7 @@ function App() {
   // (1) 検索ボタン押下時
   const handleSearch = async () => {
     try {
-      const res = await axios.get(`http://localhost:4000/api/biblios/search?q=${q}`);
+      const res = await axios.get(`https//team2-api.modernization-cloudnative.click:4000/api/biblios/search?q=${q}`);
       setSearchResults(res.data);
     } catch (err) {
       console.error(err);
@@ -23,7 +23,7 @@ function App() {
   // (2) 登録ボタン押下時
   const handleRegister = async () => {
     try {
-      const res = await axios.post('http://localhost:4000/api/biblios', {
+      const res = await axios.post('https://team2-api.modernization-cloudnative.click:4000/api/biblios', {
         isbn,
         title,
         publisher,
